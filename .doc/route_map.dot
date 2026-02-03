@@ -1,0 +1,53 @@
+digraph RoadmapActualizacion {
+    // Configuración visual
+    rankdir=TB;
+    node [shape=box, style="filled,rounded", fontname="Arial", fontsize=10, penwidth=1.5];
+    edge [fontname="Arial", fontsize=9];
+
+    // Fases
+    subgraph cluster_fase1 {
+        label = "FASE 1: Migración y Simulación (HOY)";
+        style=filled;
+        bgcolor="#e8f5e9"; // Verde claro
+        
+        Step1 [label="1. Hardware Simulado\n(ESP32 + OLED + DS3231 en Protoboard)", fillcolor="#c8e6c9"];
+        Step2 [label="2. Migración Código\n(Arduino IDE -> PlatformIO)", fillcolor="#a5d6a7"];
+        Step3 [label="3. Adaptar Drivers\n(Cambiar LCD.h por Adafruit_SSD1306\nCambiar DS1302 por DS3231)", fillcolor="#81c784"];
+        
+        Step1 -> Step2 -> Step3;
+    }
+
+    subgraph cluster_fase2 {
+        label = "FASE 2: Conectividad Local (MAÑANA)";
+        style=filled;
+        bgcolor="#e3f2fd"; // Azul claro
+        
+        Step4 [label="4. WiFi + MQTT\n(ESP32 publica estado y recibe config)", fillcolor="#bbdefb"];
+        Step5 [label="5. Setup Raspberry\n(Mosquitto Broker + Base de Datos)", fillcolor="#90caf9"];
+        
+        Step3 -> Step4;
+        Step4 -> Step5 [dir=both, label="Test Conexión"];
+    }
+
+    subgraph cluster_fase3 {
+        label = "FASE 3: Cerebro y Control (SEMANA PROXIMA)";
+        style=filled;
+        bgcolor="#fff3e0"; // Naranja claro
+        
+        Step6 [label="6. API Backend (RPi)\n(Node/Python guarda en BD)", fillcolor="#ffe0b2"];
+        Step7 [label="7. Frontend App\n(React + Gráficas)", fillcolor="#ffcc80"];
+        Step8 [label="8. Acceso Remoto\n(Instalar ZeroTier)", fillcolor="#ffb74d"];
+        
+        Step5 -> Step6 -> Step7 -> Step8;
+    }
+
+    subgraph cluster_fase4 {
+        label = "FASE 4: Despliegue Final";
+        style=filled;
+        bgcolor="#f3e5f5"; // Violeta claro
+        
+        Step9 [label="9. Hardware Final\n(Llega la placa verde\nImpresión 3D de caja)", fillcolor="#e1bee7"];
+        
+        Step8 -> Step9;
+    }
+}

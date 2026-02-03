@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "251001-000642-uno",
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"cstddef": "cpp"
+		}
+	}
+}

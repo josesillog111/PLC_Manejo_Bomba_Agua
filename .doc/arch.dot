@@ -1,0 +1,69 @@
+digraph G {
+    // Configuración general
+    rankdir=LR;
+    node [shape=box, style=filled, fontname="Arial", fontsize=10];
+    edge [fontname="Arial", fontsize=9];
+    
+    // Zonas (Subgrafos)
+    subgraph cluster_remoto {
+        label = "Mundo Exterior (Tu Celular/Laptop)";
+        style=dashed;
+        bgcolor="#f0f8ff";
+        UserDevice [label="Tu Celular\n(App React / PWA)", shape=rect, fillcolor="#add8e6"];
+        ZeroTierClient [label="Cliente ZeroTier", shape=ellipse, fillcolor="#e6e6fa"];
+    }
+
+    subgraph cluster_tunnel {
+        label = "Túnel Seguro (Internet)";
+        color=white;
+        ZeroTierNetwork [label="Red Virtual ZeroTier\n(VPN SD-WAN)", shape=cloud, fillcolor="#e6e6fa"];
+    }
+
+    subgraph cluster_casa {
+        label = "Tu Casa (Red Local)";
+        style=filled;
+        bgcolor="#fffaf0";
+        
+        subgraph cluster_rpi {
+            label = "Raspberry Pi (El Cerebro)";
+            style=solid;
+            bgcolor="#ffe4c4";
+            
+            ZeroTierHost [label="ZeroTier Service", shape=ellipse, fillcolor="#e6e6fa"];
+            Nginx [label="Web Server\n(Sirve la App React)", fillcolor="#ffcc99"];
+            API [label="API Backend\n(Node/Python)", fillcolor="#ffb347"];
+            MQTT [label="Broker MQTT\n(Mosquitto)", shape=octagon, fillcolor="#ff8c00"];
+            DB [label="Base de Datos\n(InfluxDB / SQL)", shape=cylinder, fillcolor="#ffd700"];
+            Worker [label="Script Worker\n(Guarda datos)", shape=note];
+        }
+
+        subgraph cluster_esp32 {
+            label = "Hardware (Jardín)";
+            style=solid;
+            bgcolor="#98fb98";
+            ESP32 [label="ESP32 + Relé\n(PlatformIO)", shape=component, fillcolor="#32cd32"];
+            RTC [label="DS3231\n(Reloj I2C)", shape=box, fontsize=8];
+            Pump [label="Bomba Agua", shape=circle, fillcolor="blue", fontcolor="white"];
+        }
+    }
+
+    // Conexiones Remotas
+    UserDevice -> ZeroTierClient [label="Acceso"];
+    ZeroTierClient -> ZeroTierNetwork [dir=both, style=bold, color=blue];
+    ZeroTierNetwork -> ZeroTierHost [dir=both, style=bold, color=blue, label="IP: 10.147.x.x"];
+    
+    // Conexiones Internas RPi
+    ZeroTierHost -> Nginx [label="Tráfico Interno"];
+    Nginx -> UserDevice [label="Entrega App Web", style=dashed];
+    UserDevice -> API [label="HTTP Fetch\n(GET/POST)"];
+    
+    API -> MQTT [label="Publica Config\n(Topic: /config)"];
+    Worker -> MQTT [label="Suscribe\n(Topic: /estado)"];
+    Worker -> DB [label="INSERT data"];
+    API -> DB [label="SELECT log"];
+
+    // Conexión Física
+    ESP32 -> MQTT [dir=both, label="WiFi MQTT\n(Pub/Sub)"];
+    ESP32 -> Pump [label="GPIO Pin"];
+    ESP32 -> RTC [label="I2C"];
+}
